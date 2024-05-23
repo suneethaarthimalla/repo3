@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="8506871b-3703-42fe-a16f-15f2f0bd721c" >
+		<http:listener-connection host="localhost" port="8084" readTimeout="8000000000" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="4d387b1e-0f3e-4443-b063-8f300f915918" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="JSnarayana_77" database="myschool"/>
+	</db:config>
+	<flow name="dbintegration2-23Flow" doc:id="bd8330c9-8fbe-496d-b4ec-44d77614d04a" >
+		<http:listener doc:name="Listener" doc:id="9c4c5f92-7779-44f5-8dd8-f3ede896efd9" config-ref="HTTP_Listener_config" path="/dbinte"/>
+		<!-- [STUDIO:"Select"]<db:select doc:name="Select" doc:id="e00c7409-79cc-4def-9131-d6d7b642fdd8" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from personaldata where perid =203&#93;&#93;></db:sql>
+		</db:select> [STUDIO] -->
+		<db:update doc:name="Update" doc:id="4e1cf810-f47b-47fe-a71e-0f111c5ccc20" config-ref="Database_Config">
+			<db:sql ><![CDATA[update personaldata set perid = :perid where perid=202;  ]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{"perid":payload.perid}]]]></db:input-parameters>
+		</db:update>
+		<!-- [STUDIO:"Insert"]<db:insert doc:name="Insert" doc:id="33e6fdba-7b97-4ca0-a3a9-d390d2001f2c" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into personaldata values(:perid,:pername,:perage,:perphone,:certified)&#93;&#93;></db:sql>
+			<db:input-parameters ><![CDATA[#[{"perid":payload.perid,
+	"pername":payload.pername,
+	"perage":payload.perage,
+		"perphone":payload.perphone,
+	"certified":payload.certified
+}&#93;&#93;&#93;></db:input-parameters>
+		</db:insert> [STUDIO] -->
+		<!-- [STUDIO:"Query single"]<db:query-single doc:name="Query single" doc:id="381caa1e-111d-44f0-8770-6847f9455275" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from personaldata &#93;&#93;></db:sql>
+		</db:query-single> [STUDIO] -->
+		<!-- [STUDIO:"Delete"]<db:delete doc:name="Delete" doc:id="c5ef22b3-8af0-454c-a8a8-c91589c86f6d" config-ref="Database_Config">
+			<db:sql ><![CDATA[delete from personaldata where (perid =211);
+&#93;&#93;></db:sql>
+		</db:delete> [STUDIO] -->
+		<ee:transform doc:name="Transform Message" doc:id="b991e22f-37e4-441c-b4bb-c7f3ea405630">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
